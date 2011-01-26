@@ -1,0 +1,151 @@
+# Making programs
+
+# NOTE: Include this makefile from top one, do not run it directly!
+
+# NOTE: This makefile requires already defined variables:
+#	AUTHOR, PROJECT, PLATFORM, BUILDDIR, CMACROS, LIBS, GMA, FIRST_FIT
+
+CC_U = gcc
+LINK_U = ld
+
+CFLAGS_U = -O3 -m32 -Wall -ffreestanding -nostdlib -fno-stack-protector \
+	-fdata-sections -ffunction-sections
+
+LDSCRIPT_U = arch/$(PLATFORM)/user.ld
+LDFLAGS_U = -O3 -m elf_i386 -T $(LDSCRIPT_U) --gc-sections -s
+
+#------------------------------------------------------------------------------
+
+BUILD_U := $(BUILDDIR)/progs
+
+PROG := progs
+PROG_BIN := $(BUILDDIR)/$(PROG).bin
+
+DIRS_U := programs/api $(LIBS)
+
+INCLUDES_U := . programs arch/$(PLATFORM)
+
+PROGRAM_HEADERS = $(BUILD_U)/programs.h
+
+CMACROS_U := $(CMACROS) U_DEBUG ASSERT_H=\<api/errno.h\> \
+	     PROGRAMS="\"$(PROGRAM_HEADERS)\""
+
+#------------------------------------------------------------------------------
+# Memory
+# Memory allocators: 'gma' and/or 'first_fit'
+
+MEM_ALLOCATOR_FOR_USER = $(GMA)
+
+CMACROS_U += MEM_ALLOCATOR_FOR_USER=$(MEM_ALLOCATOR_FOR_USER)
+
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+
+all: $(PROG_BIN)
+
+#------------------------------------------------------------------------------
+# Programs to include in compilation
+
+FUNCS =
+FILES_U =
+OBJS_U =
+DEPS_U =
+
+# Define each program with:
+# prog_name = 1_starting-routine 2_directories
+# (in script used with $(word n,prog_name)   ($(word n,$($1)))
+
+hello    = hello_world		programs/hello_world
+timer    = timer		programs/timer
+keyboard = keyboard		programs/keyboard
+args     = arguments		programs/arguments
+uthreads = user_threads		programs/user_threads
+threads1 = threads1		programs/threads1
+threads2 = threads2		programs/threads2
+threads3 = threads3		programs/threads3
+shell    = shell		programs/shell
+messages = messages		programs/messages
+
+lib      = null			lib
+lib_mm   = null			lib/mm
+api      = null			programs/api
+
+PROGRAMS = hello timer keyboard args shell uthreads threads1 threads2 threads3 \
+messages
+
+CCPROGRAMS = lib_mm lib api $(PROGRAMS)
+
+PROG_START_FUNC = shell
+
+CMACROS_U += PROG_START_FUNC=$(PROG_START_FUNC)
+
+# Programs compilation through template ----------------------------------------
+
+# Template is parsed twice:
+# 1) when "called" - when expanded on every "call" location;
+#    all "simple" variables and functions are evaluated
+#    (variables and functions defined with single $ character)
+#    Other ("complex") variables and function are left (but one $ is removed)
+# 2) when "final" makefile is parsed
+
+
+# $(call PROGRAM_TEMPLATE,prog_name)
+define PROGRAM_TEMPLATE
+
+$(1)_MACROS := $(CMACROS_U) PROG_HELP=$(1)_prog_help_msg
+
+$(1)_SDIR := $(word 2,$($(1)))
+$(1)_SFILES := $$(wildcard $$($(1)_SDIR)/*.c $$($(1)_SDIR)/*.S)
+
+$(1)_BDIR  := $(BUILD_U)/$$($(1)_SDIR)
+
+$(1)_OBJS  := $$(addprefix $(BUILD_U)/,$$($(1)_SFILES))
+$(1)_OBJS  := $$($(1)_OBJS:.c=.o)
+$(1)_OBJS  := $$($(1)_OBJS:.S=.asm.o)
+$(1)_DEPS  := $$($(1)_OBJS:.o=.d)
+
+FILES_U += $$($(1)_SFILES)
+OBJS_U += $$($(1)_OBJS)
+DEPS_U += $$($(1)_DEPS)
+
+# dummy file that indicate directories are created
+$(1)_BDIR_CREATED := $(BUILD_U)/.null_$(1)
+
+#create directories for objects
+$$($(1)_BDIR_CREATED):
+	@if [ ! -e $$($(1)_BDIR) ]; then mkdir -p $$($(1)_BDIR); fi;
+	@touch $$($(1)_BDIR_CREATED)
+
+#define how to compile .c files
+$$(BUILD_U)/$$($(1)_SDIR)/%.o: $$($(1)_SDIR)/%.c $$($(1)_BDIR_CREATED)
+	@echo [compiling '$(1)'] $$< ...
+	@$$(CC_U) -c $$< -o $$@ -MMD $$(CFLAGS_U) \
+		$$(foreach INC,$$(INCLUDES_U),-I $$(INC)) \
+		$$(foreach MACRO,$$($(1)_MACROS),-D $$(MACRO))
+
+#define how to compile .S files (assembler)
+$$(BUILD_U)/$$($(1)_SDIR)/%.asm.o: $$($(1)_SDIR)/%.S $$($(1)_BDIR_CREATED)
+	@echo [compiling '$(1)'] $$< ...
+	@$$(CC_U) -c $$< -o $$@ -MMD $$(CFLAGS_U) \
+		$$(foreach INC,$$(INCLUDES_U),-I$$(INC)) \
+		$$(foreach MACRO,$$($(1)_MACROS),-D $$(MACRO))
+endef
+
+# "Call" above template for each program to be included
+$(foreach prog,$(CCPROGRAMS),$(eval $(call PROGRAM_TEMPLATE,$(prog))))
+
+$(PROG_BIN): $(PROGRAM_HEADERS) $(OBJS_U) $(LDSCRIPT_U)
+	@echo [linking program]
+	@$(LINK_U) $(LDFLAGS_U) $(OBJS_U) -o$@
+
+$(PROGRAM_HEADERS): $(FILES_U)
+	@-if [ ! -e $(BUILD_U) ]; then mkdir -p $(BUILD_U); fi;
+	@-rm -f $(PROGRAM_HEADERS)
+	@$(foreach prog,$(PROGRAMS), \
+		echo "int $(word 1,$($(prog))) ( char *args[] );" \
+		>> $(PROGRAM_HEADERS); )
+	@echo "#define PROGRAMS_FOR_SHELL { \\" >> $(PROGRAM_HEADERS)
+	@$(foreach prog,$(PROGRAMS), \
+		echo "{ $(word 1,$($(prog))), \"$(prog)\", \" \" }, \\" \
+		>> $(PROGRAM_HEADERS); )
+	@echo "{NULL,NULL,NULL} }" >> $(PROGRAM_HEADERS)

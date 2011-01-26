@@ -1,0 +1,58 @@
+/*! System call - call to kernel from threads (via software interrupt) */
+
+#pragma once
+
+#include <lib/types.h>
+
+/*! syscall id's */
+enum {
+	CREATE_THREAD = 1,
+	THREAD_EXIT,
+	WAIT_FOR_THREAD,
+	CANCEL_THREAD,
+	THREAD_SELF,
+	SET_ERRNO,
+	GET_ERRNO,
+
+	GET_TIME,
+	ALARM_NEW,
+	ALARM_SET,
+	ALARM_GET,
+	WAIT_FOR_ALARM,
+	ALARM_REMOVE,
+
+	SEM_INIT,
+	SEM_DESTROY,
+	SEM_POST,
+	SEM_WAIT,
+
+	MONITOR_INIT,
+	MONITOR_DESTROY,
+	MONITOR_QUEUE_INIT,
+	MONITOR_QUEUE_DESTROY,
+	MONITOR_LOCK,
+	MONITOR_UNLOCK,
+	MONITOR_WAIT,
+	MONITOR_SIGNAL,
+	MONITOR_BROADCAST,
+
+	DEVICE_SEND,
+	DEVICE_RECV,
+	DEVICE_LOCK,
+	DEVICE_UNLOCK,
+
+	THREAD_MESG_SET,
+	CREATE_MESG_Q,
+	DELETE_MESG_Q,
+	SEND_MESG,
+	RECV_MESG,
+
+	SYSINFO,
+
+	SUSPEND,
+
+	SYSFUNCS
+};
+
+void k_syscall ( uint irqn );
+int sys__suspend ( void *p );

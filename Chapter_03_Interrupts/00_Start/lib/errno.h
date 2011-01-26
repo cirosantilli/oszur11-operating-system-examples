@@ -1,0 +1,26 @@
+/*! Error numbers, macros, ... */
+
+#pragma once
+
+/*! Example error numbers */
+enum {
+	SUCCESS = 0,
+
+	E_UNDEFINED,
+	E_UNKOWN,
+	E_UNSUPPORTED,
+	E_CANCELED,
+	E_NOT_FINISHED,
+	E_NOT_EXPIRED,
+	E_NOT_OWNER,
+	E_PARAM_NULL,
+	E_DONT_EXIST,
+	E_IGNORED,
+	E_INVALID_TYPE,
+	E_INVALID_HANDLE,
+	E_INVALID_ARGUMENT,
+	E_NO_MEMORY,
+	E_RETRY,
+	E_EMPTY,
+	E_TOO_BIG
+};

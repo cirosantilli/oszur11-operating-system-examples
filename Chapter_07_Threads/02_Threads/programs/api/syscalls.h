@@ -1,0 +1,6 @@
+/*! System calls */
+
+#include <kernel/thread.h>
+#include <kernel/time.h>
+#include <kernel/devices.h>
+#include <kernel/memory.h>

@@ -1,0 +1,58 @@
+# Making kernel
+
+# NOTE: Include this makefile from top one, do not run it directly!
+
+# NOTE: This makefile requires already defined variables:
+#	AUTHOR, PROJECT, PLATFORM, BUILDDIR, CMACROS, LIBS, GMA, FIRST_FIT
+
+CC_K = gcc
+
+CFLAGS_K = -O3 -m32 -Wall -ffreestanding -nostdlib -fno-stack-protector \
+	-fdata-sections -ffunction-sections
+
+#------------------------------------------------------------------------------
+BUILD_K = $(BUILDDIR)/kernel
+
+DIRS_K := arch/$(PLATFORM)/arch arch/$(PLATFORM)/arch/devices \
+		kernel devices $(LIBS)
+INCLUDES_K := . programs arch/$(PLATFORM)
+
+CMACROS_K := DEBUG $(CMACROS)
+
+#------------------------------------------------------------------------------
+# Memory allocators: 'gma' and/or 'first_fit'
+
+MEM_ALLOCATOR_FOR_KERNEL = $(FIRST_FIT)
+
+CMACROS_K += MEM_ALLOCATOR_FOR_KERNEL=$(MEM_ALLOCATOR_FOR_KERNEL)
+
+#------------------------------------------------------------------------------
+
+FILES_K := $(foreach DIR,$(DIRS_K),$(wildcard $(DIR)/*.c $(DIR)/*.S))
+OBJS_K := $(addprefix $(BUILD_K)/,$(FILES_K:.c=.o))
+OBJS_K := $(OBJS_K:.S=.asm.o)
+DEPS_K := $(OBJS_K:.o=.d)
+
+# dummy file that indicate directories for kernel objects are created
+KDIRS_CREATED = $(BUILD_K)/.null
+
+# create required directories in $(BUILD_K) directory (including $(BUILD_K))
+$(KDIRS_CREATED):
+	@-if [ ! -e $(BUILD_K) ]; then mkdir -p $(BUILD_K); fi;
+	@-$(foreach DIR,$(DIRS_K), if [ ! -e $(BUILD_K)/$(DIR) ]; \
+		then mkdir -p $(BUILD_K)/$(DIR); fi; )
+	@touch $(KDIRS_CREATED)
+
+# define how to compile .c files
+$(BUILD_K)/%.o: %.c Makefile.kernel $(KDIRS_CREATED)
+	@echo [compiling] $< ...
+	@$(CC_K) -c $< -o $@ -MMD $(CFLAGS_K) \
+		$(foreach INC,$(INCLUDES_K),-I $(INC)) \
+		$(foreach MACRO,$(CMACROS_K),-D $(MACRO))
+
+# define how to compile .S files (assembler)
+$(BUILD_K)/%.asm.o: %.S Makefile.kernel $(KDIRS_CREATED)
+	@echo [compiling] $< ...
+	@$(CC_K) -c $< -o $@ -MMD $(CFLAGS_K) \
+		$(foreach INC,$(INCLUDES_K),-I$(INC)) \
+		$(foreach MACRO,$(CMACROS_K),-D $(MACRO))
