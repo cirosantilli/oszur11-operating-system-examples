@@ -27,12 +27,12 @@ CMACROS = OS_NAME="\"$(OS_NAME)\"" PROJECT="\"$(PROJECT)\"" \
 CMACROS += DEBUG
 
 CC = gcc
-CFLAGS = -O3 -m32 -Wall -ffreestanding -nostdlib -fno-stack-protector \
-	-fdata-sections -ffunction-sections
+CFLAGS = -m32 -Wall -ffreestanding -nostdlib -fno-stack-protector \
+	-fdata-sections -ffunction-sections -g
 
 LINK = ld
 LDSCRIPT = arch/$(PLATFORM)/ldscript.ld
-LDFLAGS = -O3 -melf_i386 -T $(LDSCRIPT) --gc-sections -s
+LDFLAGS = -melf_i386 -T $(LDSCRIPT) --gc-sections
 
 
 #------------------------------------------------------------------------------
@@ -52,7 +52,7 @@ all: $(CDIMAGE)
 #------------------------------------------------------------------------------
 
 DIRS_K := arch/$(PLATFORM)/arch arch/$(PLATFORM)/arch/devices kernel devices
-DIRS_P := programs/api programs/hello_world
+DIRS_P := programs/api programs/hello_world programs/debug
 LIBS = lib
 
 DIRS := $(DIRS_K) $(DIRS_P) $(LIBS)
@@ -136,11 +136,16 @@ qemu: $(CDIMAGE)
 	@echo Starting...
 	@-qemu -no-kvm -cdrom $(CDIMAGE)
 
-# Debugging - just example! run it manually in different consoles
-# for debugging to work: include '-g' in CFLAGS and omit -s and -S from LDFLAGS
-qemu_debug: $(CDIMAGE)
-	@echo Starting...
-	@-qemu -s -S -no-kvm -cdrom $(CDIMAGE) &
-	@-gdb -s $(KERNEL_IMG) -ex 'target remote localhost:1234'
+# DEBUGGING
+# For debugging to work: include '-g' in CFLAGS and omit -s and -S from LDFLAGS
+# Best if -O3 flag is also ommited from CFLAGS and LDFLAGS (or some variables
+# bay be optimized away)
+# Start debugging from two consoles: 1st: make debug_qemu 2nd: make debug_gdb
+debug_qemu: $(CDIMAGE)
+	@echo Starting qemu ...
+	@qemu -s -S -no-kvm -cdrom $(CDIMAGE)
+debug_gdb: $(CDIMAGE)
+	@echo Starting gdb ...
+	@gdb -s $(BINFILE) -ex 'target remote localhost:1234'
 
 -include $(DEPS)

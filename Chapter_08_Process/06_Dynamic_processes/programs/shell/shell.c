@@ -4,6 +4,7 @@
 #include <lib/string.h>
 #include <api/time.h>
 #include <api/syscall.h>
+#include <api/thread.h>
 #include <lib/types.h>
 
 char PROG_HELP[] = "Simple command shell";

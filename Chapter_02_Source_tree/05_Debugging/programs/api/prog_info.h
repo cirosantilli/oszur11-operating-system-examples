@@ -4,3 +4,4 @@
 
 /* "programs" */
 int hello_world ();
+int debug ();

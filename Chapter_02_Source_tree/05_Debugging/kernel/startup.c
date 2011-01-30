@@ -48,6 +48,9 @@ void k_startup ( unsigned long magic, unsigned long addr )
 	kprint ( "\nStarting program: hello_world\n\n" );
 	hello_world ();
 
+	kprint ( "\nStarting program: debug\n\n" );
+	debug ();
+
 #ifdef DEBUG
 	kprint ( "\nLOG, ASSERT* test\n" );
 	debug_output_test ();

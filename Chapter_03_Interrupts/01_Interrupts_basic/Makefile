@@ -137,11 +137,16 @@ qemu: $(CDIMAGE)
 	@echo Starting...
 	@-qemu -no-kvm -cdrom $(CDIMAGE)
 
-# Debugging - just example! run it manually in different consoles
-# for debugging to work: include '-g' in CFLAGS and omit -s and -S from LDFLAGS
-qemu_debug: $(CDIMAGE)
-	@echo Starting...
-	@-qemu -s -S -no-kvm -cdrom $(CDIMAGE) &
-	@-gdb -s $(KERNEL_IMG) -ex 'target remote localhost:1234'
+# DEBUGGING
+# For debugging to work: include '-g' in CFLAGS and omit -s and -S from LDFLAGS
+# Best if -O3 flag is also ommited from CFLAGS and LDFLAGS (or some variables
+# bay be optimized away)
+# Start debugging from two consoles: 1st: make debug_qemu 2nd: make debug_gdb
+debug_qemu: $(CDIMAGE)
+	@echo Starting qemu ...
+	@qemu -s -S -no-kvm -cdrom $(CDIMAGE)
+debug_gdb: $(CDIMAGE)
+	@echo Starting gdb ...
+	@gdb -s $(BINFILE) -ex 'target remote localhost:1234'
 
 -include $(DEPS)

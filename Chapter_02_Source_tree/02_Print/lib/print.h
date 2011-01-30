@@ -2,6 +2,4 @@
 
 #pragma once
 
-#include <lib/print.h>
-
-#define kprint	__print
+int __print ( char *format, ... );

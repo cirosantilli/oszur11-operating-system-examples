@@ -2,6 +2,6 @@
 
 #pragma once
 
-#include <kernel/kprint.h>
+#include <lib/print.h>
 
-#define print	kprint
+#define print	__print
