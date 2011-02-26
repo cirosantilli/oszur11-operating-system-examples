@@ -13,16 +13,17 @@
 */
 int __print ( console_t *console, int attr, char **fmt )
 {
-	char *format = *fmt;
+	char *format;
 	char **arg = fmt;
 	int c;
 	char buf[20];
 
 	#define PRINT_CHAR(C)	console->print_char ( C, attr )
 
-	if ( !fmt || !format )
+	if ( !arg || !*arg )
 		return 0;
 
+	format = *fmt;
 	arg++; /* first argument after 'format' (on original 'print' stack) */
 
 	while ( (c = *format++) != 0 )

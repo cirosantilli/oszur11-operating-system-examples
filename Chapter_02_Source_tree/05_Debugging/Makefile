@@ -51,7 +51,7 @@ CMACROS += STACK_SIZE=0x1000
 all: $(CDIMAGE)
 #------------------------------------------------------------------------------
 
-DIRS_K := arch/$(PLATFORM)/arch arch/$(PLATFORM)/arch/devices kernel devices
+DIRS_K := arch/$(PLATFORM)/arch arch/$(PLATFORM)/arch/devices kernel
 DIRS_P := programs/api programs/hello_world programs/debug
 LIBS = lib
 
