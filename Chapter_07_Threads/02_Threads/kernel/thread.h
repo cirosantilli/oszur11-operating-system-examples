@@ -93,7 +93,7 @@ struct _kthread_t_
 	void *stack;		/* stack address and size (for deallocation) */
 	uint stack_size;
 
-	list_h al;		/* list element for list of all threads */
+	list_h all;		/* list element for list of all threads */
 
 	int exit_status;	/* status with which thread exited */
 

@@ -120,7 +120,7 @@ struct _kthread_t_
 	kthrmsg_qs msg;
 #endif
 
-	list_h al;		/* list element for list of all threads */
+	list_h all;		/* list element for list of all threads */
 
 	int exit_status;	/* status with which thread exited */
 

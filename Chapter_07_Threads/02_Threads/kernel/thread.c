@@ -110,7 +110,7 @@ kthread_t *k_create_thread ( void *start_func, void *param, void *exit_func,
 	kthr->stack = stack;
 	kthr->stack_size = stack_size;
 
-	list_append ( &all_threads, kthr, &kthr->al );
+	list_append ( &all_threads, kthr, &kthr->all );
 
 	return kthr;
 }
@@ -348,7 +348,7 @@ static void k_remove_thread_descriptor ( kthread_t *kthr )
 	k_free_unique_id ( kthr->id );
 	kthr->id = 0;
 
-	list_remove ( &all_threads, FIRST, &kthr->al );
+	list_remove ( &all_threads, FIRST, &kthr->all );
 
 	kfree ( kthr );
 }
@@ -527,7 +527,7 @@ int k_thread_info ()
 			  i++, kthr->id, kthr->sched.prio, kthr->state,
 			  kthr->exit_status );
 
-		kthr = list_get_next ( &kthr->al );
+		kthr = list_get_next ( &kthr->all );
 	}
 
 	return 0;

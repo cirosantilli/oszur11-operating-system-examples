@@ -5,8 +5,8 @@
 #------------------------------------------------------------------------------
 
 OS_NAME = "ByTheBookOS"
-NAME_MAJOR := $(shell basename `cd ..; pwd -P`)
-NAME_MINOR := $(shell basename `pwd -P`)
+NAME_MAJOR := $(shell basename "`cd ..; pwd -P`")
+NAME_MINOR := $(shell basename "`pwd -P`")
 PROJECT := $(NAME_MINOR)
 
 PLATFORM = i386
