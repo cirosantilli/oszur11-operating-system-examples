@@ -39,18 +39,18 @@ DEPS_U =
 # prog_name = 1_starting-routine 2_directory
 # (in script used with $(word n,prog_name)   ($(word n,$($1)))
 
-hello    = hello_world		programs/hello_world
-timer    = timer		programs/timer
-keyboard = keyboard		programs/keyboard
-args     = arguments		programs/arguments
-uthreads = user_threads		programs/user_threads
-threads1 = threads1		programs/threads1
-threads2 = threads2		programs/threads2
-shell    = shell		programs/shell
+hello		= hello_world		programs/hello_world
+timer		= timer			programs/timer
+keyboard	= keyboard		programs/keyboard
+args		= arguments		programs/arguments
+uthreads	= user_threads		programs/user_threads
+threads		= threads		programs/threads
+semaphores	= semaphores		programs/semaphores
+shell		= shell			programs/shell
 
-api      = null			programs/api
+api		= null			programs/api
 
-PROGRAMS = hello timer keyboard args shell uthreads threads1 threads2
+PROGRAMS = hello timer keyboard args shell uthreads threads semaphores
 
 CCPROGRAMS = api $(PROGRAMS)
 

@@ -44,12 +44,12 @@ timer    = timer		programs/timer
 keyboard = keyboard		programs/keyboard
 args     = arguments		programs/arguments
 uthreads = user_threads		programs/user_threads
-threads1 = threads1		programs/threads1
+threads  = threads		programs/threads
 shell    = shell		programs/shell
 
 api      = null			programs/api
 
-PROGRAMS = hello timer keyboard args shell uthreads threads1
+PROGRAMS = hello timer keyboard args shell uthreads threads
 
 CCPROGRAMS = api $(PROGRAMS)
 

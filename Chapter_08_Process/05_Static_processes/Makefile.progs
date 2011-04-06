@@ -39,18 +39,18 @@ CMACROS_U += MEM_ALLOCATOR_FOR_USER=$(MEM_ALLOCATOR_FOR_USER)
 # prog_name = 1_heap-size 2_stack-size 3_starting-routine 4_directories
 # (in script used with $(word n,prog_name)   ($(word n,$($1)))
 
-hello    = 0x10000 0x10000 0x1000 hello_world	programs/hello_world
-timer    = 0x10000 0x10000 0x1000 timer		programs/timer
-keyboard = 0x10000 0x10000 0x1000 keyboard	programs/keyboard
-args     = 0x10000 0x10000 0x1000 arguments	programs/arguments
-uthreads = 0x10000 0x10000 0x1000 user_threads	programs/user_threads
-threads1 = 0x10000 0x10000 0x1000 threads1	programs/threads1
-threads2 = 0x10000 0x10000 0x1000 threads2	programs/threads2
-threads3 = 0x10000 0x10000 0x1000 threads3	programs/threads3
-shell    = 0x10000 0x10000 0x1000 shell		programs/shell
-messages = 0x10000 0x10000 0x1000 messages	programs/messages
+hello		= 0x10000 0x10000 0x1000 hello_world	programs/hello_world
+timer		= 0x10000 0x10000 0x1000 timer		programs/timer
+keyboard	= 0x10000 0x10000 0x1000 keyboard	programs/keyboard
+args		= 0x10000 0x10000 0x1000 arguments	programs/arguments
+uthreads	= 0x10000 0x10000 0x1000 user_threads	programs/user_threads
+threads		= 0x10000 0x10000 0x1000 threads	programs/threads
+semaphores	= 0x10000 0x10000 0x1000 semaphores	programs/semaphores
+monitors	= 0x10000 0x10000 0x1000 monitors	programs/monitors
+messages	= 0x10000 0x10000 0x1000 messages	programs/messages
+shell		= 0x10000 0x10000 0x1000 shell		programs/shell
 
-PROGRAMS = hello timer keyboard args shell uthreads threads1 threads2 threads3 \
+PROGRAMS = hello timer keyboard args shell uthreads threads semaphores monitors \
 messages
 
 
