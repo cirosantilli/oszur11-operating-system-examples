@@ -125,6 +125,7 @@ void k_schedule_threads ()
 	int first;
 	kthread_t *curr, *next;
 	context_t dummy, *curr_cntx;
+	arch_context_t cntx;
 
 	curr = active_thread;
 
@@ -155,9 +156,13 @@ void k_schedule_threads ()
 	if ( curr != active_thread )
 	{
 		if ( curr )
+		{
 			curr_cntx = &curr->context;
-		else
+		}
+		else {
+			dummy.context = &cntx;
 			curr_cntx = &dummy;
+		}
 
 		/* switch to newly selected thread */
 		arch_switch_to_thread ( curr_cntx, &active_thread->context );
@@ -480,6 +485,10 @@ int sys__cancel_thread ( thread_t *thread )
 			SET_ERRNO ( SUCCESS );
 			/* remove target 'thread' from its queue */
 			k_threadq_remove ( kthr->queue, kthr );
+
+			if ( kthr->state == THR_STATE_READY &&
+			k_threadq_get( &ready_q[kthr->sched.prio] ) == NULL )
+				clear_got_ready ( kthr->sched.prio );
 
 			kthr->exit_status = -E_CANCELED;
 			k_remove_thread ( kthr );

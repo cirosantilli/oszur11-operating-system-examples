@@ -527,6 +527,11 @@ int sys__cancel_thread ( void *p )
 		move_to_ready ( active_thread );
 		/* remove target 'thread' from its queue */
 		k_threadq_remove ( kthr->queue, kthr );
+
+		if ( kthr->state == THR_STATE_READY &&
+			k_threadq_get( &ready_q[kthr->sched.prio] ) == NULL )
+			clear_got_ready ( kthr->sched.prio );
+
 		/* mark it as active and 'end' it normally */
 		active_thread = kthr;
 		active_thread->state = THR_STATE_ACTIVE;
